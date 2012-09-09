@@ -1,1 +1,51 @@
-todo (accidently deleted :()
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1, minimum-scale=1">   
+  <meta name="apple-mobile-web-app-capable" content="yes">    
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Drone remote</title>
+  <style type="text/css">
+    .button {
+    	padding: 40px;
+    	font-size: 30px;
+    	margin: 20px;
+    	float: left;
+    	border: 1px #ccc solid;
+    	background-color: #ececec;
+    	border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="remote">
+  	<div class="button" data-remote="takeoff">Takeoff</div>
+  	<div class="button" data-remote="land">Land</div>
+  	<div class="button" data-remote="front">Front</div>
+  	<div class="button" data-remote="back">Back</div>
+  	<div class="button" data-remote="left">Left</div>
+  	<div class="button" data-remote="right">Right</div>
+  	<div class="button" data-remote="turn">Turn</div>
+  	<div class="button" data-remote="stop">stop</div>
+  </div>
+  <script type="text/javascript" 
+          src="http://localhost:3333/faye.js"></script>  
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript">
+	var client = new Faye.Client('http://localhost:3333/faye'); 
+    $('.button').mousedown(function(el){
+      console.log("down")
+      console.log($(this).attr('data-remote'))
+      client.publish("/drone/do", {command: $(this).attr('data-remote'), param: 0.1});
+    });
+    $('.button').mouseup(function(el){
+      if ($(this).attr('data-remote') != "stop" && $(this).attr('data-remote') != "land" && $(this).attr('data-remote') != "takeoff") {
+        console.log("up")
+        console.log($(this).attr('data-remote'))      	
+        client.publish("/drone/do", {command: $(this).attr('data-remote'), param: 0});	
+      }
+    });    
+  </script>
+</body>
+</html>

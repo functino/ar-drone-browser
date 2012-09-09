@@ -40,17 +40,29 @@ client.subscribe('/drone/do', function(data) {
     drone.takeoff();
   }
   if (data.command == "front") {
-    console.log("front")
-    drone.front(0.1);
+    console.log("front " + data.param)
+    drone.front(data.param);
   }  
   if (data.command == "back") {
-    console.log("back")
-    drone.back(0.1);
-  }    
+    console.log("back" + data.param)
+    drone.back(data.param);
+  }
+  if (data.command == "left") {
+    console.log("left" + data.param)
+    drone.left(data.param);
+  }
+  if (data.command == "right") {
+    console.log("right" + data.param)
+    drone.right(data.param);
+  }
   if (data.command == "stop") {
     console.log("stop");
     drone.stop();
-  }    
+  }   
+  if (data.command == "turn") {
+    console.log("turn");
+    drone.turn(15, data.param);
+  }   
   if (data.command == "land") {
     console.log("land")
     drone.stop();
