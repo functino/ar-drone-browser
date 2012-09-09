@@ -14,6 +14,8 @@ server.configure(function() {
 server.listen(3015);
 
 drone.connect(function(err) {
+  console.log("drone connected")
+  console.log(err);
   // drone.sequence() 
   //   .takeoff(5)
   //   .up(1, 0.2)
