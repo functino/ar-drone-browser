@@ -76,7 +76,7 @@ client.subscribe('/drone/do', function(data) {
   }   
   if (data.command == "turn") {
     console.log("turn");
-    drone.turn(15, data.param);
+    drone.turn(data.param);
   }   
   if (data.command == "land") {
     console.log("land")
