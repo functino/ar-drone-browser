@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1, minimum-scale=1">   
+  <meta name="apple-mobile-web-app-capable" content="yes">    
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Drone remote</title>
+  <style type="text/css">
+    body {
+      padding: 100px;
+    }
+    #remote {
+    	font-size: 30px;
+    	border: 1px #ccc solid;
+    	background-color: #ececec;
+    	border-radius: 10px;
+      margin: 0 auto;
+      width: 500px;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+  <div id="remote">
+  </div>
+  <script type="text/javascript" 
+          src="http://localhost:3333/faye.js"></script>  
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript">
+	var client = new Faye.Client('http://localhost:3333/faye'); 
+    $('.button').mousedown(function(el){
+      console.log($(this).attr('data-remote'))
+      client.publish("/drone/do", {command: $(this).attr('data-remote'), param: $('#speed').val()});
+    });
+    $('.button').mouseup(function(el){
+      if ($(this).attr('data-remote') != "stop" && $(this).attr('data-remote') != "land" && $(this).attr('data-remote') != "takeoff") {
+        console.log("stop " + $(this).attr('data-remote'))      	
+        client.publish("/drone/do", {command: $(this).attr('data-remote'), param: 0});	
+      }
+    });    
+  var REMOTE_SIZE = 250;
+  var STOP_RADIUS = 50;
+  var STOPPED = false;
+  var UP = false;
+  var DOWN = false;
+  var normalizeSpeed = function(pos) {
+    var speed = 0;
+    pos = Math.abs(pos)
+    if (pos > STOP_RADIUS) {
+      speed = pos / REMOTE_SIZE;
+    }
+    return speed
+  }
+  $("#remote").mousemove(function(ev){
+     if (STOPPED) {
+       return false;
+     }
+     var parentOffset = $(this).offset(); 
+     //or $(this).offset(); if you really just want the current element's offset
+     var relX = ev.pageX - parentOffset.left - REMOTE_SIZE;
+     var relY = ev.pageY - parentOffset.top - REMOTE_SIZE;
+
+     if (Math.abs(relX) < STOP_RADIUS && Math.abs(relY) < STOP_RADIUS) {
+       client.publish("/drone/do", {command: "stop"});
+     } else {
+       if (relX < 0) {
+         client.publish("/drone/do", {command: "left", param: normalizeSpeed(relX)});
+       } else {
+        client.publish("/drone/do", {command: "right", param: normalizeSpeed(relX)});
+       }
+
+       if (relY < 0) {
+         client.publish("/drone/do", {command: "front", param:  normalizeSpeed(relY)});
+       } else {
+         client.publish("/drone/do", {command: "back", param:  normalizeSpeed(relY)});
+       }       
+     }
+     console.log(relX, relY);
+  });    
+  $(document).keydown(function(ev){
+    console.log(ev.keyCode);
+    // land on l or escape
+    if (ev.keyCode == 27 || ev.kayCode == 76) {
+      STOPPED = true;
+      client.publish("/drone/do", {command: "land"});
+    }
+    // startup on s or space
+    if (ev.keyCode == 83  || ev.kayCode == 32) {
+      client.publish("/drone/do", {command: "takeoff"});
+    }    
+    // up arrow
+    if (ev.keyCode == 38 && !UP) {
+      client.publish("/drone/do", {command: "up", param: 0.3});
+      UP = true;
+    }
+    // down arrow
+    if (ev.keyCode == 40 && !DOWN) {
+      client.publish("/drone/do", {command: "down", param: 0.3});
+      DOWN = true;
+    }    
+
+    // left for start turning
+    if (ev.keyCode == 37) {
+      client.publish("/drone/do", {command: "turn", param: 0.3});
+    }
+    // right for start turning
+    if (ev.keyCode == 39) {
+      client.publish("/drone/do", {command: "turn", param: 0});
+    } 
+    return false;
+  });
+
+  $(document).keyup(function(ev){
+    console.log(ev.keyCode);
+    // up arrow
+    if (ev.keyCode == 38 && UP) {
+      client.publish("/drone/do", {command: "up", param: 0});
+      UP = false;
+    }
+    // down arrow
+    if (ev.keyCode == 40 && DOWN) {
+      client.publish("/drone/do", {command: "down", param: 0});
+      DOWN = false
+    }
+    return false;
+  });  
+  </script>
+</body>
+</html>

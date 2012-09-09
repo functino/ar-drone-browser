@@ -29,10 +29,15 @@ drone.connect(function(err) {
 });
 
 var client = new Faye.Client('http://localhost:3333/faye');
-var remoteTemplate = fs.readFileSync(__dirname + "/remote.html", "utf-8");
+
 
 server.get("/", function(req, res, next) {
+  var remoteTemplate = fs.readFileSync(__dirname + "/remote.html", "utf-8");
   res.send(eco.render(remoteTemplate, {}));
+});
+server.get("/alternative", function(req, res, next) {
+  var remote2Template= fs.readFileSync(__dirname + "/remote2.html", "utf-8");
+  res.send(eco.render(remote2Template, {}));
 });
 client.subscribe('/drone/do', function(data) {
   if (data.command == "takeoff") {
