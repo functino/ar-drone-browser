@@ -1,4 +1,4 @@
-var drone = require('./ar-drone').createClient();
+var drone = require('ar-drone').createClient();
 var Faye   = require('faye');
 var eco = require("eco");
 var fs  = require("fs");
