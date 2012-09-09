@@ -55,6 +55,14 @@ client.subscribe('/drone/do', function(data) {
     console.log("right" + data.param)
     drone.right(data.param);
   }
+  if (data.command == "up") {
+    console.log("up" + data.param)
+    drone.up(data.param);
+  }
+  if (data.command == "down") {
+    console.log("down" + data.param)
+    drone.down(data.param);
+  }  
   if (data.command == "stop") {
     console.log("stop");
     drone.stop();

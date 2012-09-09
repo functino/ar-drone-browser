@@ -20,6 +20,7 @@
 </head>
 <body>
   <div id="remote">
+  	<input id="speed" name="speed" value="0.1" />
   	<div class="button" data-remote="takeoff">Takeoff</div>
   	<div class="button" data-remote="land">Land</div>
   	<div class="button" data-remote="front">Front</div>
@@ -27,6 +28,8 @@
   	<div class="button" data-remote="left">Left</div>
   	<div class="button" data-remote="right">Right</div>
   	<div class="button" data-remote="turn">Turn</div>
+  	<div class="button" data-remote="up">Up</div>  	
+  	<div class="button" data-remote="down">Down</div>  	
   	<div class="button" data-remote="stop">stop</div>
   </div>
   <script type="text/javascript" 
@@ -35,14 +38,12 @@
   <script type="text/javascript">
 	var client = new Faye.Client('http://localhost:3333/faye'); 
     $('.button').mousedown(function(el){
-      console.log("down")
       console.log($(this).attr('data-remote'))
-      client.publish("/drone/do", {command: $(this).attr('data-remote'), param: 0.1});
+      client.publish("/drone/do", {command: $(this).attr('data-remote'), param: $('#speed').val()});
     });
     $('.button').mouseup(function(el){
       if ($(this).attr('data-remote') != "stop" && $(this).attr('data-remote') != "land" && $(this).attr('data-remote') != "takeoff") {
-        console.log("up")
-        console.log($(this).attr('data-remote'))      	
+        console.log("stop " + $(this).attr('data-remote'))      	
         client.publish("/drone/do", {command: $(this).attr('data-remote'), param: 0});	
       }
     });    
