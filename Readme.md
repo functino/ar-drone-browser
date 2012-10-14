@@ -1,3 +1,8 @@
+This project is outdated
+=========================
+If your looking for a way to remote control your ar drone look here:
+https://github.com/functino/drone-browser
+
 Usage
 ========
 Start your ar drone 2.0 and connect to it via wlan. Then run node lookaround.js and open up localhost:3015 in your browser.
